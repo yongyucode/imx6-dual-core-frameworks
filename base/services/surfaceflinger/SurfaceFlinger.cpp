@@ -1304,7 +1304,7 @@ void SurfaceFlinger::EinkOptPostFramebuffer()
                 }
                 else
                 {
-                    LOGI("------normal update-----------");
+                    // LOGI("------normal update-----------");
                     Vector<Rect> allrectList;
                     Vector<int>  allupdatemode;
                     allrectList.add(mSwapRegion.getBounds());
