@@ -40,13 +40,16 @@ import java.io.FileNotFoundException;
 class WiredAccessoryObserver extends UEventObserver {
     private static final String TAG = WiredAccessoryObserver.class.getSimpleName();
     private static final boolean LOG = true;
-    private static final int MAX_AUDIO_PORTS = 5; /* h2w, USB Audio */
+    private static final int MAX_AUDIO_PORTS = 6; /* h2w, USB Audio */
     private static final String uEventInfo[][] = { {"DEVPATH=/devices/platform/imx-3stack-sgtl5000.0",
                                                     "/sys/devices/platform/imx-3stack-sgtl5000.0/driver/headphone",
                                                     "headphone"},
                                                    {"DEVPATH=/devices/platform/imx-sgtl5000.0",
                                                     "/sys/devices/platform/imx-sgtl5000.0/driver/headphone",
                                                     "headphone"},
+												   {"DEVPATH=/devices/platform/imx-wm8960.0",
+													"/sys/devices/platform/imx-wm8960.0/driver/headphone",
+													"headphone"},
                                                    {"DEVPATH=/devices/platform/imx-wm8958.0",
                                                     "/sys/devices/platform/imx-wm8958.0/driver/headphone",
                                                     "headphone"},
@@ -144,6 +147,18 @@ class WiredAccessoryObserver extends UEventObserver {
                 }
         }
 
+		if(event.get("DEVPATH").equals("/devices/platform/imx-wm8960.0")){
+			try {
+				String name_headphone = event.get("NAME");
+				if (!name_headphone.equals("amic")){
+					int state_headphone = Integer.parseInt(event.get("STATE"));
+					updateState(name_headphone, state_headphone);
+				}
+			} catch (NumberFormatException e) {
+				Slog.e(TAG, "Could not parse switch state from event " + event);
+			}
+		}
+
         if(event.get("DEVPATH").equals("/devices/virtual/switch/usb_audio")){
                 try {
                         String name_usb = event.get("SWITCH_NAME");
@@ -194,7 +209,7 @@ class WiredAccessoryObserver extends UEventObserver {
                 newName = new String(buffer, 0, len).trim();
                 */
                 newState_String =new String(buffer, 0, len).trim();
-                if(i==0 || i== 1 || i ==2 || i ==3){
+                if(i==0 || i== 1 || i ==2 || i ==3 || i ==4){
                        if (newState_String.equals("headset"))
                              newState = 1;
                        else if (newState_String.equals("headphone"))
